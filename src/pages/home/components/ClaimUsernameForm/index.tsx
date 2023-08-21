@@ -12,7 +12,7 @@ const claimUsernameFormSchema = z.object({
     .regex(/^([a-z\\-]+)$/i, {
       message: 'O usuário precisa ter apenas letras e números',
     }) /* Específica que o nome de usuário pode ter somente letras e - */
-    .transform((username) => username.toLocaleLowerCase()),
+    .transform((username) => username.toLowerCase()),
 })
 
 type ClaimUsernameFormData = z.infer<typeof claimUsernameFormSchema>
