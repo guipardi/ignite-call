@@ -1,6 +1,7 @@
 import { Box, Button, Heading, MultiStep, Text } from '@ignite-ui/react'
 import { ConnectBox, Container, Header } from './styles'
 import { ArrowRight } from 'phosphor-react'
+import { signIn } from 'next-auth/react'
 
 export default function ConnectCalendar() {
   return (
@@ -16,7 +17,7 @@ export default function ConnectCalendar() {
       <ConnectBox>
         <Box as="form">
           <Text>Google Agenda</Text>
-          <Button variant="secondary">
+          <Button variant="secondary" onClick={() => signIn('google')}>
             Conectar
             <ArrowRight />
           </Button>
