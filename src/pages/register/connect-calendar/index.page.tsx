@@ -17,7 +17,11 @@ export default function ConnectCalendar() {
       <ConnectBox>
         <Box as="form">
           <Text>Google Agenda</Text>
-          <Button variant="secondary" onClick={() => signIn('google')}>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => signIn('google')}
+          >
             Conectar
             <ArrowRight />
           </Button>
