@@ -34,3 +34,8 @@ export const ConnectBox = styled(Box, {
     padding: '$4 $6',
   },
 })
+
+export const AuthError = styled(Text, {
+  color: '#f75a68',
+  marginBottom: '$2',
+})
