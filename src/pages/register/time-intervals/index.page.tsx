@@ -20,6 +20,7 @@ import { z } from 'zod'
 import { Controller, useFieldArray, useForm } from 'react-hook-form'
 import { getWeekDays } from '@/src/utils/get-week-days'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { convertTimeInStringToMinutes } from '@/src/utils/convert-time-string-to-minutes'
 
 const timeIntervalsFormSchema = z.object({
   intervals: z
@@ -35,10 +36,32 @@ const timeIntervalsFormSchema = z.object({
     .transform((intervals) => intervals.filter((interval) => interval.enabled))
     .refine((intervals) => intervals.length > 0, {
       message: 'Você deve selecionar ao menos um dia da semana!',
-    }),
+    })
+    .transform((intervals) =>
+      intervals.map((interval) => {
+        return {
+          weekDay: interval.weekDay,
+          startTimeInMinutes: convertTimeInStringToMinutes(interval.startTime),
+          endTimeInMinutes: convertTimeInStringToMinutes(interval.endTime),
+        }
+      }),
+    )
+    .refine(
+      (intervals) => {
+        return intervals.every(
+          (interval) =>
+            interval.endTimeInMinutes - 60 >= interval.startTimeInMinutes,
+        )
+      },
+      {
+        message:
+          'O horário de término deve ser 1 hora distante do horário de ínicio',
+      },
+    ),
 })
 
-type handleSetTimeIntervalsData = z.infer<typeof timeIntervalsFormSchema>
+type handleSetTimeIntervalsDataInput = z.input<typeof timeIntervalsFormSchema>
+type handleSetTimeIntervalsDataOutput = z.output<typeof timeIntervalsFormSchema>
 
 export default function TimeIntervals() {
   const {
@@ -47,7 +70,11 @@ export default function TimeIntervals() {
     watch,
     control,
     formState: { errors, isSubmitting },
-  } = useForm({
+  } = useForm<
+    handleSetTimeIntervalsDataInput,
+    handleSetTimeIntervalsDataOutput,
+    any
+  >({
     resolver: zodResolver(timeIntervalsFormSchema),
     defaultValues: {
       intervals: [
@@ -71,7 +98,9 @@ export default function TimeIntervals() {
 
   const intervals = watch('intervals')
 
-  async function handleSetTimeIntervals(data: handleSetTimeIntervalsData) {
+  async function handleSetTimeIntervals(
+    data: handleSetTimeIntervalsDataOutput,
+  ) {
     console.log(data)
   }
 
