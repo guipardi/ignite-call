@@ -5,9 +5,11 @@ import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import dayjs from 'dayjs'
+import { api } from '@/src/lib/axios'
+import { useRouter } from 'next/router'
 
 const confirmStepFormSchema = z.object({
-  username: z
+  name: z
     .string()
     .min(3, { message: 'O nome precisa de no mínimo 3 caracteres' }),
   email: z.string().email({ message: 'Digite um email válido' }),
@@ -33,8 +35,20 @@ export function ConfirmStep({
     resolver: zodResolver(confirmStepFormSchema),
   })
 
-  function handleConfirmScheduling(data: ConfirmStepData) {
-    console.log(data)
+  const router = useRouter()
+  const username = String(router.query.username)
+
+  async function handleConfirmScheduling(data: ConfirmStepData) {
+    const { name, email, observations } = data
+
+    await api.post(`/users/${username}/schedule`, {
+      name,
+      email,
+      observations,
+      date: schedulingDate,
+    })
+
+    onCancelConfirmation()
   }
 
   const describedDate = dayjs(schedulingDate).format('DD[ de ]MMMM[ de ]YYYY')
@@ -57,12 +71,10 @@ export function ConfirmStep({
         <Text size="sm">Nome completo</Text>
         <TextInput
           placeholder="Seu nome"
-          {...register('username')}
+          {...register('name')}
           crossOrigin={undefined}
         />
-        {errors.username && (
-          <FormError size="sm">{errors.username.message}</FormError>
-        )}
+        {errors.name && <FormError size="sm">{errors.name.message}</FormError>}
       </label>
 
       <label>
